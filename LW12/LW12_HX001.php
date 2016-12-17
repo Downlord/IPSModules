@@ -55,6 +55,42 @@ class LW12_HX001 {
 		$status = strtoupper($status);
 		$status = str_split($status, 2);
 
+		// 01: Init (0x66)
+		// 02: Init (0x01)
+		// 03: Off (0x24) / On (0x23)
+		// 04: Mode (0x25 - 0x38)
+		// 05: Running (0x21) / Stopped (0x20)
+		// 06: Speed  (1/10th seconds?) (0x00 - 0xff)
+		// 07: Red (0x00 - 0xff)
+		// 08: Green (0x00 - 0xff)
+		// 09: Blue (0x00 - 0xff)
+		// 10: User Memory used (0xFF) / not used (0x51)
+		// 11: Termination (0x99)
+
+
+		switch($status[2])
+		{
+			case '23':
+				$this->power = true;
+				break;
+			default:
+				$this->power = false;
+		}
+
+		$this->mode = hexdec($status[3]) - $this->offset;
+
+		switch($status[4])
+		{
+			case '21':
+				$this->modestate = true;
+				break;
+			default:
+				$this->modestate = false;
+		}
+
+		$this->speed = intval((abs(hexdec($status[5]) - 32)/31)*100);
+
+		$this->color = (hexdec($status[6]) * 256 * 256) + (hexdec($status[7]) * 256) + hexdec($status[8]);
 		// Antwortstring?
 
 		}
@@ -94,7 +130,7 @@ class LW12_HX001 {
 
 	private function sendPacket( $command, $return )
 	{
-		$fp = fsockopen($this->IP, $this->Port, $errno, $errstr, 10);
+		$fp = fsockopen($this->IP, $this->Port, $errno, $errstr, 3);
 		if (!$fp)
 		    throw new Exception("Error opening socket: ".$errstr." (".$errno.")");
 		$command = hex2bin($command);
