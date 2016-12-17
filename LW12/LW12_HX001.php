@@ -81,14 +81,14 @@ class LW12_HX001 {
 
 	public function SetBrightness($brightness)
 	{
-		throw new Exception('Not implemented');
+		#throw new Exception('Not implemented');
 	}
 
 	public function SetMode($mode, $speed)
 	{
 		$speed = intval(abs(($speed/100) * 31 - 32));
 		$command = 'bb' . dechex($mode + $this->offset) . str_pad(dechex($speed),2,0,STR_PAD_LEFT) . '44';
-		throw new Exception('Not implemented');
+		#throw new Exception('Not implemented');
 		$this->sendPacket($command, 0);
 	}
 
